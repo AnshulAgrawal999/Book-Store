@@ -5,9 +5,9 @@ const jwt  = require( 'jsonwebtoken' )  ;
 const dotenv = require( 'dotenv' )  ;
 
 
-const { UserModel } = require( '../models/userModel' )  ;
+const { UserModel } = require( '../models/UserModel' )  ;
 
-const { BlackListModel } = require( '../models/blackListModel' )  ;
+const { BlackListModel } = require( '../models/BlackListModel' )  ;
 
 
 dotenv.config()  ;
@@ -18,15 +18,15 @@ const registerUser = async ( req , res ) => {
 
     try {
 
-        const { email , password } = req.body  ;
+        const { useremail , userpassword } = req.body  ;
 
-        const user = await UserModel.findOne( { email } )  ;
+        const user = await UserModel.findOne( { useremail } )  ;
 
         if( !user )
         {   
-            if ( password.length > 7 && (/\d/.test(password) )) 
+            if ( userpassword.length > 7 && (/\d/.test(userpassword) )) 
             {
-                bcrypt.hash( password , 5 , async function(err, hash) {
+                bcrypt.hash( userpassword , 5 , async function(err, hash) {
                     if( err )
                     {
                         res.send( { "error" : err } )  ;
@@ -35,7 +35,7 @@ const registerUser = async ( req , res ) => {
                     {
                         const newuser = new UserModel( req.body )  ;
 
-                        newuser.password = hash  ;
+                        newuser.userpassword = hash  ;
 
                         await newuser.save()  ;
 
@@ -62,13 +62,13 @@ const registerUser = async ( req , res ) => {
 const loginUser = async ( req , res )=>{
 
     try {
-        const { email , password  } = req.body  ;
+        const { useremail , userpassword  } = req.body  ;
 
-        const user = await UserModel.findOne( { email } )  ;
+        const user = await UserModel.findOne( { useremail } )  ;
 
         if( user )
         {
-            bcrypt.compare( password , user.password , function(err, result) {
+            bcrypt.compare( userpassword , user.userpassword , function(err, result) {
                 if( err )
                 {
                     res.send( { "error" : err } )  ;
@@ -76,9 +76,9 @@ const loginUser = async ( req , res )=>{
 
                 if( result )
                 {
-                    const accessToken = jwt.sign( { email } , process.env.accessSecretKey , { expiresIn: '30m' } )  ;
+                    const accessToken = jwt.sign( { useremail } , process.env.accessSecretKey , { expiresIn: '60m' } )  ;
 
-                    const refreshToken = jwt.sign( { email } , process.env.refreshSecretKey , { expiresIn: '1d' } )  ;
+                    const refreshToken = jwt.sign( { useremail } , process.env.refreshSecretKey , { expiresIn: '1d' } )  ;
 
                     res.status(200).send( {"msg":"Login successful!", accessToken , refreshToken } )  ;
                 }
@@ -127,7 +127,7 @@ const refreshToken = async ( req , res ) => {
             {
                 if ( !err )
                 {
-                    const newaccessToken = jwt.sign( { 'email' : decoded.email } , process.env.accessSecretKey , { expiresIn: '30m' } )   ;
+                    const newaccessToken = jwt.sign( { 'useremail' : decoded.useremail } , process.env.accessSecretKey , { expiresIn: '60m' } )   ;
     
                     res.status(200).send({ "newaccessToken" : newaccessToken })  ;
                 }
