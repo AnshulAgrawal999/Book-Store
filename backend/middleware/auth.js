@@ -3,7 +3,7 @@ const jwt = require( 'jsonwebtoken' )  ;
 const dotenv = require( 'dotenv' )  ;
 
 
-const { BlackListModel } = require( '../models/blackListModel' )  ;
+const { BlackListModel } = require( '../models/BlackListModel' )  ;
 
 
 dotenv.config()  ;
@@ -23,7 +23,7 @@ const auth = async ( req , res , next ) => {
             {
                 if ( !err )
                 {
-                    req.body.email = decoded.email  ;
+                    req.body.useremail = decoded.useremail  ;
 
                     next()  ;
                 }
