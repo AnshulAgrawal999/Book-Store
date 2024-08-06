@@ -1,42 +1,42 @@
-const { CartModel } = require( '../models/cartModel' )  ;
+const { CartModel } = require( '../models/CartModel' )  ;
 
 
 const getCart = async ( req , res ) => {
     try {
 
-        const { email } = req.body  ;
+        const { useremail } = req.body  ;
 
-        const products = await CartModel.find( { email } )  ;
+        const books = await CartModel.find( { useremail } )  ;
 
-        res.status(200).send( products )  ;
+        res.status(200).send( books )  ;
 
     } catch (error) {
         res.status(400).send( {error} )  ;
     } 
 }
 
-const addProductInCart = async ( req , res )=>{
+const addBookInCart = async ( req , res )=>{
 
     try {
         
-        const product = new CartModel( req.body )  ;
+        const book = new CartModel( req.body )  ;
 
-        await product.save()  ;
+        await book.save()  ;
 
-        res.status(201).send( { "msg":"Product added" , product } )  ;
+        res.status(201).send( { "msg":"Product added" , book } )  ;
 
     } catch (error) {
         res.status(400).send( {error} )  ;
     }
 }
 
-const updateProductInCart = async ( req , res )=>{
+const updateBookInCart = async ( req , res )=>{
 
     try {
 
         const id = req.params.id  ; 
 
-        await CartModel.updateOne( { 'email' : req.body.email , '_id' : id } , req.body )  ;
+        await CartModel.updateOne( { 'useremail' : req.body.useremail , '_id' : id } , req.body )  ;
 
         res.status(201).send( {"msg":"Product has been updated"} )  ;
 
@@ -45,12 +45,12 @@ const updateProductInCart = async ( req , res )=>{
     }
 }
 
-const deleteProductInCart = async ( req , res )=>{
+const deleteBookInCart = async ( req , res )=>{
     
     try {
         const id = req.params.id  ; 
 
-        await CartModel.deleteOne( { 'email' : req.body.email , '_id' : id } )  ;
+        await CartModel.deleteOne( { 'useremail' : req.body.useremail , '_id' : id } )  ;
 
         res.status(200).send( {"msg":"Product has been deleted"} )  ;
 
@@ -60,4 +60,4 @@ const deleteProductInCart = async ( req , res )=>{
 } 
 
 
-module.exports = { getCart , addProductInCart , updateProductInCart , deleteProductInCart }  ;
+module.exports = { getCart , addBookInCart , updateBookInCart , deleteBookInCart }  ;
