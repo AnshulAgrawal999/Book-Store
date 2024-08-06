@@ -2,11 +2,12 @@ const mongoose = require( 'mongoose' )  ;
 
 const bookSchema = mongoose.Schema(
 {
-    image : { type : String , required : true },
-    title : { type : String , required : true },
-    prize : { type: String , required : true },
-    author: { type: String, required : true },
-    description : { type: String, required : true }
+    bookimage : { type : String , required : true },
+    booktitle : { type : String , required : true },
+    bookprize : { type: String , required : true },
+    bookauthor: { type: String, required : true },
+    bookdescription : { type: String, required : true },
+    authoremail : { type: String , required : true }
 }
 )
 
