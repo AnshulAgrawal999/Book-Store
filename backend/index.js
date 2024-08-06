@@ -6,9 +6,13 @@ dotenv.config()  ;
 
 const cors = require( 'cors' )  ;
 
+const PORT = process.env.PORT || 6000  ;
+
 const { connection } = require( './configs/db' )  ;
 
-const PORT = process.env.PORT || 6000  ;
+const { userRouter } = require( './routes/userRoutes' )  ;
+
+const { cartRouter } = require( './routes/cartRoutes' )  ;
 
 const app = express()  ;
 
@@ -18,10 +22,13 @@ app.use( express.json() )  ;
 
 app.get( '/' , ( req , res ) => {
 
-    res.send( { 'msg' : 'this is Book-Store home page' } )  ;
+    res.send( { 'msg' : 'this is Book Store home page' } )  ;
     
 } )  ;
 
+app.use( '/user ' , userRouter )  ;
+
+app.use( '/cart' , cartRouter )  ;
 
 app.listen( PORT , async ()=>{
     try {
