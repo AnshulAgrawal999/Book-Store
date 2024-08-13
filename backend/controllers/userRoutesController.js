@@ -113,6 +113,57 @@ const logoutUser = async ( req , res ) => {
     }
 } 
 
+const deleteUser = async ( req , res ) => {
+    
+    try {
+        const { useremail , userpassword  } = req.body  ;
+
+        const user = await UserModel.findOne( { useremail } )  ;
+
+        if( user )
+        {
+            bcrypt.compare( userpassword , user.userpassword , async function(err, result) {
+                if( err )
+                {
+                    res.send( { "error" : err } )  ;
+                }
+
+                if( result )
+                {
+                    await UserModel.deleteOne( { 'useremail' : req.body.useremail } )  ;
+
+                    const accessToken = req.body.accessToken  ;
+
+                    const refreshToken = req.body.refreshToken  ;
+
+                    await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
+
+                    res.status(200).send( {"msg":"User accout has been deleted" }  )  ;
+                }
+                else
+                {
+                    res.send( { "msg" : "Password is incorrect" } )  ;
+                }
+            });
+        }
+        else
+        {
+            res.send( { "msg" : "Email is incorrect" } )  ;
+        }
+
+    } catch (error) {
+        res.status(400).send( { "error" : error } )  ;
+    }
+
+
+    try {
+        
+        
+    } catch (error) {
+        res.status(400).send( { "error" : error } )  ;
+    }
+} 
+
 const refreshToken = async ( req , res ) => {
 
     try {
@@ -148,4 +199,4 @@ const refreshToken = async ( req , res ) => {
 }
 
 
-module.exports = { registerUser , loginUser , logoutUser , refreshToken }  ;
+module.exports = { registerUser , loginUser , logoutUser , deleteUser , refreshToken }  ;

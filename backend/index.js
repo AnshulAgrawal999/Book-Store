@@ -14,11 +14,14 @@ const { userRouter } = require( './routes/userRoutes' )  ;
 
 const { cartRouter } = require( './routes/cartRoutes' )  ;
 
+
 const app = express()  ;
+
+
+app.use( express.json() )  ;
 
 app.use( cors() )  ;
 
-app.use( express.json() )  ;
 
 app.get( '/' , ( req , res ) => {
 
@@ -26,9 +29,11 @@ app.get( '/' , ( req , res ) => {
     
 } )  ;
 
-app.use( '/user ' , userRouter )  ;
+
+app.use( '/user' , userRouter )  ;
 
 app.use( '/cart' , cartRouter )  ;
+
 
 app.listen( PORT , async ()=>{
     try {
