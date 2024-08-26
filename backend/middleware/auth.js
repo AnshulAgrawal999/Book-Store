@@ -19,7 +19,7 @@ const auth = async ( req , res , next ) => {
 
         if ( !item )
         {
-            jwt.verify( accessToken , process.env.accessSecretKey , function(err, decoded) 
+            jwt.verify( accessToken , process.env.accessSecretKey , function( err , decoded ) 
             {
                 if ( !err )
                 {

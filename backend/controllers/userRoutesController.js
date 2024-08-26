@@ -24,35 +24,27 @@ const registerUser = async ( req , res ) => {
 
         if( !user )
         {   
-            if ( userpassword.length > 7 && (/\d/.test(userpassword) )) 
-            {
-                bcrypt.hash( userpassword , 5 , async function(err, hash) {
-                    if( err )
-                    {
-                        res.send( { "error" : err } )  ;
-                    }
-                    else
-                    {
-                        const newuser = new UserModel( req.body )  ;
+            bcrypt.hash( userpassword , 3 , async function(err, hash) {
+                if( err )
+                {
+                    res.status(200).send( { "error" : err } )  ;
+                }
+                else
+                {
+                    const newuser = new UserModel( req.body )  ;
 
-                        newuser.userpassword = hash  ;
+                    newuser.userpassword = hash  ;
 
-                        await newuser.save()  ;
+                    await newuser.save()  ;
 
-                        res.status(200).send( { "msg" : "The new user has been registered", newuser } )  ;
-                    }
-                })  ;
-            }
-            else
-            {
-                res.status(200).send( { "msg" : "password should be at least 8 characters long and contain one number" } )  ;
-            }
+                    res.status(201).send( { "msg" : "Account Created!", newuser } )  ;
+                }
+            })  ;
         }
         else
         {
-            res.status(200).send( { "msg" : "Email is already registered" } )  ;
+            res.status(200).send( { "msg" : "Account with this email already present!" } )  ;
         }
-
         
     } catch (error) {
         res.status(400).send( { "error" : error } )  ;
@@ -71,7 +63,7 @@ const loginUser = async ( req , res )=>{
             bcrypt.compare( userpassword , user.userpassword , function(err, result) {
                 if( err )
                 {
-                    res.send( { "error" : err } )  ;
+                    res.status(200).send( { "error" : err } )  ;
                 }
 
                 if( result )
@@ -80,17 +72,17 @@ const loginUser = async ( req , res )=>{
 
                     const refreshToken = jwt.sign( { useremail } , process.env.refreshSecretKey , { expiresIn: '1d' } )  ;
 
-                    res.status(200).send( {"msg":"Login successful!", accessToken , refreshToken } )  ;
+                    res.status(200).send( { "msg" :"Login successful!" , accessToken , refreshToken } )  ;
                 }
                 else
                 {
-                    res.send( { "msg" : "Password is incorrect" } )  ;
+                    res.status(200).send( { "msg" : "Password is incorrect!" } )  ;
                 }
             });
         }
         else
         {
-            res.send( { "msg" : "Email is incorrect" } )  ;
+            res.status(200).send( { "msg" : "Incorrect email! No user found" } )  ;
         }
 
     } catch (error) {
@@ -100,9 +92,7 @@ const loginUser = async ( req , res )=>{
 
 const logoutUser = async ( req , res ) => {
     try {
-        const accessToken = req.body.accessToken  ;
-
-        const refreshToken = req.body.refreshToken  ;
+        const { accessToken , refreshToken } = req.body  ;
 
         await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
 
@@ -116,7 +106,7 @@ const logoutUser = async ( req , res ) => {
 const deleteUser = async ( req , res ) => {
     
     try {
-        const { useremail , userpassword  } = req.body  ;
+        const { useremail , userpassword , accessToken , refreshToken } = req.body  ;
 
         const user = await UserModel.findOne( { useremail } )  ;
 
@@ -125,40 +115,28 @@ const deleteUser = async ( req , res ) => {
             bcrypt.compare( userpassword , user.userpassword , async function(err, result) {
                 if( err )
                 {
-                    res.send( { "error" : err } )  ;
+                    res.status(200).send( { "error" : err } )  ;
                 }
 
                 if( result )
                 {
-                    await UserModel.deleteOne( { 'useremail' : req.body.useremail } )  ;
-
-                    const accessToken = req.body.accessToken  ;
-
-                    const refreshToken = req.body.refreshToken  ;
+                    await UserModel.deleteOne( { 'useremail' : useremail } )  ;
 
                     await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
 
-                    res.status(200).send( {"msg":"User accout has been deleted" }  )  ;
+                    res.status(200).send( { "msg" : "Accout has been deleted" , user }  )  ;
                 }
                 else
                 {
-                    res.send( { "msg" : "Password is incorrect" } )  ;
+                    res.status(200).send( { "msg" : "Password is incorrect" } )  ;
                 }
-            });
+            })  ;
         }
         else
         {
-            res.send( { "msg" : "Email is incorrect" } )  ;
+            res.status(200).send( { "msg" : "Email is incorrect" } )  ;
         }
 
-    } catch (error) {
-        res.status(400).send( { "error" : error } )  ;
-    }
-
-
-    try {
-        
-        
     } catch (error) {
         res.status(400).send( { "error" : error } )  ;
     }
@@ -168,29 +146,31 @@ const refreshToken = async ( req , res ) => {
 
     try {
 
-        const refreshToken = req.headers.authorization  ;
+        const { accessToken , refreshToken } = req.body  ;
 
-        const item = await BlackListModel.findOne( { "token" : refreshToken } )  ;
+        const item1 = await BlackListModel.findOne( { "token" : accessToken } )  ;
 
-        if ( !item )
+        const item2 = await BlackListModel.findOne( { "token" : refreshToken } )  ;
+
+        if ( item1 && !item2 )
         {
-            jwt.verify( refreshToken , process.env.refreshSecretKey , function(err, decoded) 
+            jwt.verify( refreshToken , process.env.refreshSecretKey , function( err , decoded ) 
             {
                 if ( !err )
                 {
                     const newaccessToken = jwt.sign( { 'useremail' : decoded.useremail } , process.env.accessSecretKey , { expiresIn: '60m' } )   ;
     
-                    res.status(200).send({ "newaccessToken" : newaccessToken })  ;
+                    res.status(200).send( { "newaccessToken" : newaccessToken } )  ;
                 }
                 else
                 {
-                    res.send( { "error" : err } )  ;
+                    res.status(200).send( { "error" : err } )  ;
                 }
             });
         }
         else
         {
-            res.send( { "msg" : "Your are not logged in" } )  ;
+            res.status(200).send( { "msg" : "Your are not logged in" } )  ;
         } 
 
     } catch (error) {
