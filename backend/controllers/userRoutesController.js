@@ -45,12 +45,12 @@ const registerUser = async ( req , res ) => {
             }
             else
             {
-                res.send( { "msg" : "password should be at least 8 characters long and contain one number" } )  ;
+                res.status(200).send( { "msg" : "password should be at least 8 characters long and contain one number" } )  ;
             }
         }
         else
         {
-            res.send( { "msg" : "Email is already registered, go to login" } )  ;
+            res.status(200).send( { "msg" : "Email is already registered" } )  ;
         }
 
         

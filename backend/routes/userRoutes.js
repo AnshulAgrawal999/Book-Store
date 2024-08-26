@@ -1,5 +1,7 @@
 const express = require( 'express' )  ;
 
+const { passwordCheck } = require( '../middleware/validate' )
+
 const { auth } = require( '../middleware/auth' )  ;
 
 
@@ -8,13 +10,13 @@ const { registerUser , loginUser , logoutUser , refreshToken , deleteUser } = re
 
 const userRouter = express.Router()  ;
 
-userRouter.post( '/register' , registerUser )  ;
+userRouter.post( '/register' , passwordCheck , registerUser )  ;
 
 userRouter.post( '/login' , loginUser )  ;
 
 userRouter.post( '/logout' , logoutUser )   ;
 
-userRouter.delete( '/delete' , auth , deleteUser )  ;
+userRouter.delete( '/account/delete' , auth , deleteUser )  ;
 
 userRouter.get( '/refreshtoken' , refreshToken )  ;
 

@@ -29,17 +29,17 @@ const auth = async ( req , res , next ) => {
                 }
                 else
                 {
-                    res.send( { "error" : err } )  ;
+                    res.status(200).send( { "error" : err } )  ;
                 }
             });
         }
         else
         {
-            res.send( { "msg" : "Your are not logged in" } )  ;
+            res.status(200).send( { "msg" : "Your are not logged in" } )  ;
         }      
         
     } catch (error) {
-        res.send( { "error" : error } )  ;
+        res.status(400).send( { "error" : error } )  ;
     }
 } 
 
