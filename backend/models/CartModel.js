@@ -7,7 +7,8 @@ const cartSchema = mongoose.Schema(
     bookprize : { type: Number , required : true },
     bookauthor: { type: String, required : true },
     bookdescription : { type: String, required : true },
-    useremail : { type: String , required : true }
+    useremail : { type: String , required : true },
+    number : { type: Number , required : true }
 },
 {
     versionKey : false

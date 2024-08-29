@@ -13,9 +13,9 @@ cartRouter.post( '/' , auth , getCart )  ;
 
 cartRouter.post( '/add' , auth , addBookInCart )  ;
 
-cartRouter.patch( '/update/:id' , auth , updateBookInCart )  ;
+cartRouter.patch( '/update' , auth , updateBookInCart )  ;
 
-cartRouter.delete( '/delete/:id' , auth , deleteBookInCart )  ;
+cartRouter.delete( '/delete' , auth , deleteBookInCart )  ;
 
 
 module.exports = { cartRouter }  ;

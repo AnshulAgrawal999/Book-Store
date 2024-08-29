@@ -11,22 +11,35 @@ const getCart = async ( req , res ) => {
         res.status(200).send( books )  ;
 
     } catch (error) {
-        res.status(400).send( {error} )  ;
+        res.status(400).send( { error } )  ;
     } 
 }
 
 const addBookInCart = async ( req , res )=>{
 
     try {
+
+        const { booktitle , bookauthor , useremail } = req.body  ;
+
+        const book = await CartModel.findOne( { booktitle , bookauthor , useremail } )  ;
+
+        if( !book )
+        {
+            const newbook = new CartModel( req.body )  ;
+
+            newbook.number = 1  ;
+
+            await newbook.save()  ;
+
+            res.status(201).send( { "msg" : "Book added to cart" , newbook } )  ;
+        }
+        else
+        {
+            res.status(200).send( { "msg" : "Book is already present in cart" } )  ;
+        }    
         
-        const book = new CartModel( req.body )  ;
-
-        await book.save()  ;
-
-        res.status(201).send( { "msg":"Product added" , book } )  ;
-
     } catch (error) {
-        res.status(400).send( {error} )  ;
+        res.status(400).send( { error } )  ;
     }
 }
 
@@ -34,11 +47,11 @@ const updateBookInCart = async ( req , res )=>{
 
     try {
 
-        const id = req.params.id  ; 
+        const { booktitle , bookauthor , useremail } = req.body  ;
 
-        await CartModel.updateOne( { 'useremail' : req.body.useremail , '_id' : id } , req.body )  ;
+        const book = await CartModel.updateOne( { booktitle , bookauthor , useremail } , req.body )  ;
 
-        res.status(201).send( {"msg":"Product has been updated"} )  ;
+        res.status(201).send( { "msg" : "Book has been updated" , book } )  ;
 
     } catch (error) {
         res.status(400).send( {error} )  ;
@@ -48,11 +61,12 @@ const updateBookInCart = async ( req , res )=>{
 const deleteBookInCart = async ( req , res )=>{
     
     try {
-        const id = req.params.id  ; 
+        
+        const { booktitle , bookauthor , useremail } = req.body  ;
 
-        await CartModel.deleteOne( { 'useremail' : req.body.useremail , '_id' : id } )  ;
+        await CartModel.deleteOne( { booktitle , bookauthor , useremail } )  ;
 
-        res.status(200).send( {"msg":"Product has been deleted"} )  ;
+        res.status(200).send( { "msg" : "Book removed from cart" } )  ;
 
     } catch (error) {
         res.status(400).send( {error} )  ;
