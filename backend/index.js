@@ -25,7 +25,7 @@ app.use( cors() )  ;
 
 app.get( '/' , ( req , res ) => {
 
-    res.status(200).send( { 'msg' : 'this is Book Store home page' } )  ;
+    res.status(200).send( { 'msg' : 'this is Your Book Store app home page' } )  ;
     
 } )  ;
 

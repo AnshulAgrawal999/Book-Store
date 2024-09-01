@@ -76,13 +76,13 @@ const loginUser = async ( req , res )=>{
                 }
                 else
                 {
-                    res.status(200).send( { "msg" : "Password is incorrect!" } )  ;
+                    res.status(200).send( { "msg" : "Incorrect password!" } )  ;
                 }
             });
         }
         else
         {
-            res.status(200).send( { "msg" : "Incorrect email! No user found" } )  ;
+            res.status(200).send( { "msg" : "No user account found with this email" } )  ;
         }
 
     } catch (error) {
@@ -98,6 +98,44 @@ const logoutUser = async ( req , res ) => {
 
         res.status(200).send( {"msg":"User has been logged out" }  )  ;
         
+    } catch (error) {
+        res.status(400).send( { "error" : error } )  ;
+    }
+} 
+
+const changePassword = async ( req , res ) => {
+    try {
+        const { useremail , olduserpassword , newuserpassword , accessToken , refreshToken } = req.body  ;
+
+        const user = await UserModel.findOne( { useremail } )  ;
+
+        if( user )
+        {
+            bcrypt.compare( olduserpassword , user.userpassword , async function(err, result) {
+                if( err )
+                {
+                    res.status(200).send( { "error" : err } )  ;
+                }
+
+                if( result )
+                {
+                    await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
+
+                    await UserModel.updateOne( { 'useremail' : useremail } , { 'userpassword' : newuserpassword } )  ;
+
+                    res.status(200).send( { "msg" : "Password has been updated! User logged out" }  )  ;
+                }
+                else
+                {
+                    res.status(200).send( { "msg" : "Incorrect password" } )  ;
+                }
+            })  ;
+        }
+        else
+        {
+            res.status(200).send( { "msg" : "Incorrect email" } )  ;
+        }
+
     } catch (error) {
         res.status(400).send( { "error" : error } )  ;
     }
@@ -120,21 +158,21 @@ const deleteUser = async ( req , res ) => {
 
                 if( result )
                 {
-                    await UserModel.deleteOne( { 'useremail' : useremail } )  ;
-
                     await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
+                    
+                    await UserModel.deleteOne( { 'useremail' : useremail } )  ;
 
                     res.status(200).send( { "msg" : "Accout has been deleted" , user }  )  ;
                 }
                 else
                 {
-                    res.status(200).send( { "msg" : "Password is incorrect" } )  ;
+                    res.status(200).send( { "msg" : "Incorrect password" } )  ;
                 }
             })  ;
         }
         else
         {
-            res.status(200).send( { "msg" : "Email is incorrect" } )  ;
+            res.status(200).send( { "msg" : "Incorrect email" } )  ;
         }
 
     } catch (error) {
@@ -170,7 +208,7 @@ const refreshToken = async ( req , res ) => {
         }
         else
         {
-            res.status(200).send( { "msg" : "Your are not logged in" } )  ;
+            res.status(200).send( { "msg" : "You are not logged in" } )  ;
         } 
 
     } catch (error) {
@@ -179,4 +217,4 @@ const refreshToken = async ( req , res ) => {
 }
 
 
-module.exports = { registerUser , loginUser , logoutUser , deleteUser , refreshToken }  ;
+module.exports = { registerUser , loginUser , logoutUser , changePassword ,deleteUser , refreshToken }  ;

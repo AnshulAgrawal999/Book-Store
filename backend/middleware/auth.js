@@ -35,7 +35,7 @@ const auth = async ( req , res , next ) => {
         }
         else
         {
-            res.status(200).send( { "msg" : "Your are not logged in" } )  ;
+            res.status(200).send( { "msg" : "You are not logged in" } )  ;
         }      
         
     } catch (error) {
