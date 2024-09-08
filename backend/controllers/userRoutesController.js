@@ -169,11 +169,11 @@ const deleteUser = async ( req , res ) => {
 
                 if( result )
                 {
-                    await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
-                    
                     await UserModel.deleteOne( { 'useremail' : useremail } )  ;
+                    
+                    await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
 
-                    res.status(200).send( { "msg" : "Accout has been deleted" , user }  )  ;
+                    res.status(200).send( { "msg" : "Accout has been deleted and user has been logged out" , user }  )  ;
                 }
                 else
                 {
@@ -201,25 +201,35 @@ const refreshToken = async ( req , res ) => {
 
         const item2 = await BlackListModel.findOne( { "token" : refreshToken } )  ;
 
-        if ( item1 && !item2 )
+        if ( !item1 && !item2 )
         {
-            jwt.verify( refreshToken , process.env.refreshSecretKey , function( err , decoded ) 
+            jwt.verify( refreshToken , process.env.refreshSecretKey , function( error , decoded ) 
             {
-                if ( !err )
+                if ( !error )
                 {
-                    const newaccessToken = jwt.sign( { 'useremail' : decoded.useremail } , process.env.accessSecretKey , { expiresIn: '100m' } )   ;
-    
-                    res.status(200).send( { "newaccessToken" : newaccessToken } )  ;
+                    jwt.verify( accessToken , process.env.accessSecretKey , function( err ) 
+                    {
+                        if ( err.name === 'TokenExpiredError' )
+                        {
+                            const newaccessToken = jwt.sign( { 'useremail' : decoded.useremail } , process.env.accessSecretKey , { expiresIn: '100m' } )   ;
+            
+                            res.status(200).send( { "newaccessToken" : newaccessToken } )  ;
+                        }
+                        else
+                        {
+                            res.status(200).send( { "error" : err } )  ;
+                        }
+                    });
                 }
                 else
                 {
-                    res.status(200).send( { "error" : err } )  ;
+                    res.status(200).send( { "error" : error } )  ;
                 }
             });
         }
         else
         {
-            res.status(200).send( { "msg" : "You are not logged in" } )  ;
+            res.status(200).send( { "msg" : "You are logged out" } )  ;
         } 
 
     } catch (error) {
