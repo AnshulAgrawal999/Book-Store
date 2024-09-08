@@ -58,7 +58,7 @@ const updateBookInCart = async ( req , res )=>{
     }
 }
 
-const deleteBookInCart = async ( req , res )=>{
+const removeBookFromCart = async ( req , res )=>{
     
     try {
         
@@ -73,5 +73,20 @@ const deleteBookInCart = async ( req , res )=>{
     }
 } 
 
+const emptyCart = async ( req , res )=>{
+    
+    try {
+        
+        const { useremail } = req.body  ;
 
-module.exports = { getCart , addBookInCart , updateBookInCart , deleteBookInCart }  ;
+        await CartModel.deleteMany( { useremail } )  ;
+
+        res.status(200).send( { "msg" : "Empty Cart" } )  ;
+
+    } catch (error) {
+        res.status(400).send( {error} )  ;
+    }
+} 
+
+
+module.exports = { getCart , addBookInCart , updateBookInCart , removeBookFromCart , emptyCart }  ;

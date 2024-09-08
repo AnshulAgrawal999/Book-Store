@@ -5,7 +5,7 @@ const { passwordCheck } = require( '../middleware/validate' )  ;
 const { auth } = require( '../middleware/auth' )  ;
 
 
-const { registerUser , loginUser , logoutUser , changePassword , refreshToken , deleteUser } = require( '../controllers/userRoutesController' )  ;
+const { registerUser , loginUser , logoutUser , changePassword , deleteUser , refreshToken  } = require( '../controllers/userRoutesController' )  ;
 
 
 const userRouter = express.Router()  ;
@@ -18,9 +18,9 @@ userRouter.post( '/logout' , auth , logoutUser )   ;
 
 userRouter.patch( '/changepassword' , auth , changePassword )   ;
 
-userRouter.delete( '/delete' , auth , deleteUser )  ;
+userRouter.delete( '/deleteaccount' , auth , deleteUser )  ;
 
-userRouter.get( '/refreshtoken' , refreshToken )  ;
+userRouter.post( '/refreshtoken' , refreshToken )  ;
 
 
 
