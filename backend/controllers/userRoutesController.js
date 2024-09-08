@@ -121,11 +121,20 @@ const changePassword = async ( req , res ) => {
 
                 if( result )
                 {
-                    await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
+                    bcrypt.hash( newuserpassword , 3 , async function ( err , hash ) {
+                        if( err )
+                        {
+                            res.status(200).send( { "error" : err } )  ;
+                        }
+                        else
+                        {
+                            await UserModel.updateOne( { 'useremail' : useremail } , { 'userpassword' : hash } )  ;
 
-                    await UserModel.updateOne( { 'useremail' : useremail } , { 'userpassword' : newuserpassword } )  ;
+                            await BlackListModel.insertMany( [ { "token" : accessToken } , { "token" : refreshToken } ] )  ;
 
-                    res.status(200).send( { "msg" : "Password has been updated! User has been logged out" }  )  ;
+                            res.status(200).send( { "msg" : "Password has been updated! User has been logged out" }  )  ;
+                        }
+                    })  ;
                 }
                 else
                 {

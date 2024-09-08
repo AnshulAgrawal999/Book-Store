@@ -9,7 +9,7 @@ const { auth } = require( '../middleware/auth' )  ;
 const cartRouter = express.Router()  ;
 
 
-cartRouter.post( '/' , auth , getCart )  ;
+cartRouter.post( '/get' , auth , getCart )  ;
 
 cartRouter.post( '/addbook' , auth , addBookInCart )  ;
 
